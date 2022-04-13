@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Atendimento Online</title>
+  </head>
+  <body>
+    <div id='emptyError' class="empty hidden">
+      Mensagem vazia não pode >:(
+      <p class="smallerText">Aperte tab para entrar no input</p>
+    </div>
+    <div class="chat">
+      <div class="inside">
+        <div class="title">
+          Atendimento on-line
+        </div>
+        <div id='chat-box' class="chat-box">
+          <p>
+            Atendente diz:
+          </p>
+          <p class="blablabla">
+            Blabla blabla blabla
+          </p>
+          <p>
+            Atendente diz:
+          </p>
+          <p class="blablabla">
+            Blabla blabla blabla
+          </p>
+          <p class="m208">
+            Você diz:
+          </p>
+          <p class="blablabla m100">
+            Blabla blabla blabla
+          </p>
+          <p class="m208">
+            Você diz:
+          </p>
+          <p class="blablabla m100">
+            Blabla blabla blabla
+          </p>
+        </div>
+        <div class="send">
+          <input
+            id="inputMessage"
+            class="typemessage"
+            type="text"
+            placeholder="Digite sua mensagem..."
+          />
+          <button class="button" id="enviar" type="submit">Enviar</button>
+        </div>
+      </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+      var socket = io();
+
+      function emptyMessage() {
+        const emptyError = document.getElementById('emptyError')
+        console.log('emptyError', emptyError);
+        emptyError.className = "empty visible";
+
+        setTimeout(() => {
+          emptyError.className = "empty hidden"
+        }, 500);
+      }
+
+      function enviaMensagem(item) {
+        if (item == '' || item == null) {
+          emptyMessage()
+          return
+        }
+
+        socket.emit('chat message', item);
+      }
+
+      const enviar = document.getElementById("enviar");
+
+      enviar.addEventListener("click", function(event) {
+        event.preventDefault();
+
+        const inputMessage = document.getElementById("inputMessage");
+
+        enviaMensagem(inputMessage.value)
+      });
+
+      document.addEventListener('keypress', e => {
+        if (e.key == 'Enter') {
+          const inputMessage = document.getElementById("inputMessage");
+
+          enviaMensagem(inputMessage.value)
+        }
+      })
+
+      socket.on('chat message', function(msg) {
+        const chatbox = document.getElementById('chat-box')
+        const youSaid = document.createElement('p')
+
+        youSaid.className = 'm208'
+        youSaid.innerHTML = 'Você diz:'
+
+        chatbox.appendChild(youSaid)
+
+        const yourMessage = document.createElement('p')
+
+        yourMessage.className = 'blablabla m100'
+        yourMessage.innerHTML = msg
+
+        chatbox.appendChild(yourMessage)
+
+        document.getElementById("inputMessage").value = ''
+      });
+    </script>
+  </body>
+</html>
